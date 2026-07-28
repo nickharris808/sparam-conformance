@@ -187,3 +187,29 @@ def test_reference_adapter_conforms():
     assert r["checker_errors"] == 0
     assert r["false_pass"] == 0, f"sparam-lint false passes: {r['per_case']}"
     assert r["passed"]
+
+
+# ------------------------------------------------------- viewer index
+
+def test_index_matches_the_manifest_exactly():
+    """The browsable index is a view of the manifest, never a second source."""
+    import json as _json
+    import subprocess
+    import sys as _sys
+    here = Path(__file__).resolve().parents[1]
+    idx = here / "data" / "index.jsonl"
+    assert idx.exists(), "index.jsonl missing -- run build_index.py"
+    rows = [_json.loads(x) for x in idx.read_text().splitlines() if x.strip()]
+    man = _json.loads((here / "data" / "manifest.json").read_text())
+    assert len(rows) == len(man["cases"]) == man["n_cases"]
+    by_name = {r["name"]: r for r in rows}
+    for c in man["cases"]:
+        r = by_name[c["name"]]
+        assert r["physically_realizable"] == c["physical"]
+        assert r["expected_failures"] == sorted(
+            k for k, v in c["expect"].items() if not v)
+    # and it must regenerate identically
+    before = idx.read_bytes()
+    subprocess.run([_sys.executable, str(here / "build_index.py")],
+                   capture_output=True, check=True)
+    assert idx.read_bytes() == before, "index.jsonl is stale vs the manifest"
