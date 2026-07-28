@@ -34,7 +34,7 @@ opinion. We know `active_gain` is non-passive because we built 3× gain into it.
 ## 30-second quickstart
 
 ```bash
-git clone <this-repo> && cd sparam-conformance
+git clone https://github.com/nickharris808/sparam-conformance.git && cd sparam-conformance
 
 python score.py --checker mypackage.mychecker:run     # grade your checker
 python generate.py                                    # optional: rebuild the corpus
@@ -166,6 +166,29 @@ data/*.s2p, *.s4p         the corpus
 data/manifest.json        labels, tags, SHA-256 digests
 tests/                    label verification + scorer tests
 ```
+
+## The rest of the toolkit
+
+Eight artifacts that answer one question in different places: **is this
+model physically possible?** Each is a grader — it can tell you a model is
+wrong; none can tell you one is right.
+
+| | |
+|---|---|
+| [`sparam-lint`](https://github.com/nickharris808/sparam-lint) | Is an S-parameter model physically possible? Five laws + a negative control. |
+| [`maxwell-lint`](https://github.com/nickharris808/maxwell-lint) | Does a coupling extractor predict impossible physics? Screening ceiling k ≤ 1. |
+| [`abstain-bench`](https://github.com/nickharris808/abstain-bench) | Does a model know when to shut up? Abstention recall, never pooled with accuracy. |
+| [`sparam-conformance`](https://huggingface.co/datasets/nickh007/sparam-conformance) ← you are here | 11 labelled networks with verified ground truth. Grades the graders. |
+| [`screening-ceiling`](https://huggingface.co/datasets/nickh007/screening-ceiling) | A certified impossibility result + 27 counterexamples. Zero-dependency verifier. |
+| [`physics-lint-action`](https://github.com/nickharris808/physics-lint-action) | The same checks, in your CI. |
+| [`physics-lint-mcp`](https://github.com/nickharris808/physics-lint-mcp) | A physics oracle your AI agent can call. |
+| [**Try it in your browser**](https://huggingface.co/spaces/nickh007/physics-lint) | All three checks, no install, runs client-side. |
+
+These tools **grade** a model. Producing one that is passive *by
+construction* — so it cannot fail these laws whatever its parameters — and
+accurate at speed in the many-body regime, with calibrated abstention and a
+fail-closed signoff certificate, is the commercial core:
+**[ChipletOS](https://chipletos.com)**.
 
 ## Licence
 
