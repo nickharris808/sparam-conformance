@@ -38,7 +38,7 @@ def load_manifest(data_dir: Path = DATA) -> dict:
     mf = data_dir / "manifest.json"
     if not mf.exists():
         raise SystemExit(f"no manifest at {mf} -- run generate.py first")
-    return json.loads(mf.read_text())
+    return json.loads(mf.read_text(encoding="utf-8"))
 
 
 def _load_checker(spec: str):

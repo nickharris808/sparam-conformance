@@ -196,7 +196,7 @@ def write_touchstone(path: Path, c: Case) -> None:
             vals = list(m.reshape(-1))
         lines.append(f"{f:.12g} " + " ".join(
             f"{v.real:.12g} {v.imag:.12g}" for v in vals))
-    path.write_text("\n".join(lines) + "\n")
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
 
 def main() -> int:
@@ -243,7 +243,8 @@ def main() -> int:
             "sha256": digest,
         })
 
-    (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+    (out / "manifest.json").write_text(
+        json.dumps(manifest, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(f"wrote {len(cases)} cases + manifest.json to {out}")
     return 0
 

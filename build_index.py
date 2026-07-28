@@ -19,7 +19,7 @@ DATA = HERE / "data"
 
 
 def build() -> list[dict]:
-    m = json.loads((DATA / "manifest.json").read_text())
+    m = json.loads((DATA / "manifest.json").read_text(encoding="utf-8"))
     rows = []
     for c in m["cases"]:
         expect = c["expect"]
@@ -41,7 +41,7 @@ def build() -> list[dict]:
 def main() -> int:
     rows = build()
     out = DATA / "index.jsonl"
-    with out.open("w") as fh:
+    with out.open("w", encoding="utf-8", newline="\n") as fh:
         for r in rows:
             fh.write(json.dumps(r, sort_keys=True) + "\n")
     print(f"{out.relative_to(HERE)}: {len(rows)} rows")

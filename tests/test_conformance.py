@@ -199,8 +199,8 @@ def test_index_matches_the_manifest_exactly():
     here = Path(__file__).resolve().parents[1]
     idx = here / "data" / "index.jsonl"
     assert idx.exists(), "index.jsonl missing -- run build_index.py"
-    rows = [_json.loads(x) for x in idx.read_text().splitlines() if x.strip()]
-    man = _json.loads((here / "data" / "manifest.json").read_text())
+    rows = [_json.loads(x) for x in idx.read_text(encoding="utf-8").splitlines() if x.strip()]
+    man = _json.loads((here / "data" / "manifest.json").read_text(encoding="utf-8"))
     assert len(rows) == len(man["cases"]) == man["n_cases"]
     by_name = {r["name"]: r for r in rows}
     for c in man["cases"]:
@@ -222,7 +222,7 @@ def test_readme_flags_the_one_figure_it_cannot_reproduce():
     one does not, so the card has to say so -- and the resonator it describes
     must actually be passive today, or the anecdote is worse than the bug.
     """
-    readme = (HERE / "README.md").read_text()
+    readme = (HERE / "README.md").read_text(encoding="utf-8")
     assert "1.2441" in readme, "drop this guard along with the figure"
     assert "cannot reproduce from the" in readme
     assert "superseded generator revision" in readme
