@@ -230,3 +230,48 @@ def test_readme_flags_the_one_figure_it_cannot_reproduce():
     net = read_touchstone(str(HERE / "data" / "passive_resonator.s2p"))
     sigma = float(np.max(np.linalg.svd(net.s, compute_uv=False)))
     assert sigma <= 1.0 + 1e-9, f"shipped resonator is not passive: {sigma}"
+
+
+# ------------------------------------- an unreported law must not be a pass
+
+def _score_with(fn):
+    from score import load_manifest, score
+    return score(fn, load_manifest())
+
+
+def test_a_checker_that_omits_a_law_is_incomplete_not_conforming():
+    """The corpus cannot certify a law the checker never reported."""
+    from sparam_lint_adapter import check as complete
+
+    def missing_passivity(path):
+        return {k: v for k, v in complete(path).items() if k != "passivity"}
+
+    full = _score_with(complete)
+    assert full["verdict"] == "CONFORMING" and full["passed"]
+    assert full["n_missing"] == 0
+
+    partial = _score_with(missing_passivity)
+    assert partial["false_pass"] == 0, "the omission is not a false pass"
+    assert partial["n_missing"] == full["n_cases"], "one law short on every case"
+    assert partial["verdict"] == "INCOMPLETE", (
+        "a checker missing a whole law was told it conforms"
+    )
+    assert not partial["passed"], "INCOMPLETE must not exit 0"
+
+
+def test_a_false_pass_still_outranks_incompleteness():
+    """Admitting a non-physical network is the worse failure and keeps its name."""
+    def permissive_and_partial(path):
+        return {"reciprocity": True, "energy_conservation": True,
+                "positive_real_z0": True, "group_delay_nonneg": True,
+                "passivity": True}  # passes everything, including the violators
+
+    r = _score_with(permissive_and_partial)
+    assert r["false_pass"] > 0
+    assert r["verdict"] == "NOT CONFORMING"
+
+
+def test_readme_verdict_table_matches_the_scorer():
+    readme = (HERE / "README.md").read_text(encoding="utf-8")
+    for verdict in ("CONFORMING", "INCOMPLETE", "NOT CONFORMING"):
+        assert f"`{verdict}`" in readme, f"README does not document the {verdict} verdict"

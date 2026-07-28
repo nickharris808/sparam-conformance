@@ -102,6 +102,7 @@ def score(checker, manifest: dict, data_dir: Path = DATA) -> dict:
         })
 
     n_law_checks = len(manifest["cases"]) * len(laws)
+    n_missing = sum(len(c.get("missing_laws", [])) for c in per_case)
     return {
         "corpus_version": manifest["version"],
         "n_cases": len(manifest["cases"]),
@@ -109,13 +110,24 @@ def score(checker, manifest: dict, data_dir: Path = DATA) -> dict:
         "false_pass": false_pass,
         "false_fail": false_fail,
         "checker_errors": errors,
+        "n_missing": n_missing,
         "per_law": per_law,
         "per_case": per_case,
-        "passed": false_pass == 0 and errors == 0,
+        # A law the checker never reported was never checked, so the corpus has
+        # nothing to say about it. Calling that CONFORMING would be a verdict
+        # we did not earn, which is the failure mode this whole corpus exists
+        # to catch -- so it gets its own state rather than a pass.
+        "verdict": ("NOT CONFORMING" if (false_pass or errors)
+                    else "INCOMPLETE" if n_missing
+                    else "CONFORMING"),
+        "passed": false_pass == 0 and errors == 0 and n_missing == 0,
         "verdict_rule": (
-            "A conforming checker has ZERO false passes and ZERO errors. "
-            "False fails are reported but do not fail the verdict, because a "
-            "conservative checker is safe; a permissive one is not."
+            "A conforming checker has ZERO false passes, ZERO errors, and "
+            "reports every law on every case. False fails are reported but do "
+            "not fail the verdict, because a conservative checker is safe and a "
+            "permissive one is not. A checker that omits a law is INCOMPLETE "
+            "rather than conforming: an unreported law was not checked, and "
+            "this corpus cannot certify what it never saw."
         ),
     }
 
@@ -162,7 +174,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  false passes : {result['false_pass']}   <- must be 0")
         print(f"  false fails  : {result['false_fail']}")
         print(f"  errors       : {result['checker_errors']}")
-        print(f"  verdict      : {'CONFORMING' if result['passed'] else 'NOT CONFORMING'}")
+        if result["n_missing"]:
+            print(f"  laws not reported : {result['n_missing']}   <- must be 0")
+        print(f"  verdict      : {result['verdict']}")
 
     return 0 if result["passed"] else 1
 

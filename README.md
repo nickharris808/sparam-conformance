@@ -21,7 +21,7 @@ configs:
 
 # sparam-conformance
 
-![CI](https://github.com/nickharris808/sparam-conformance/actions/workflows/ci.yml/badge.svg) ![Licence](https://img.shields.io/badge/data-CC--BY--4.0-green) ![Cases](https://img.shields.io/badge/cases-11%20labelled-blue) ![Tests](https://img.shields.io/badge/tests-48%20passing-brightgreen)
+![CI](https://github.com/nickharris808/sparam-conformance/actions/workflows/ci.yml/badge.svg) ![Licence](https://img.shields.io/badge/data-CC--BY--4.0-green) ![Cases](https://img.shields.io/badge/cases-11%20labelled-blue) ![Tests](https://img.shields.io/badge/tests-51%20passing-brightgreen)
 
 **A labelled corpus of S-parameter networks with ground-truth physical verdicts —
 and a scorer that grades any checker against it.**
@@ -85,6 +85,17 @@ A checker has two independent ways to be wrong, with very different costs:
 
 So both are reported, per law, and **the verdict requires zero false passes**.
 False fails are reported but do not fail the verdict.
+
+There is a third state, because there is a third way to be wrong. A checker that
+never reports a law has not passed it — it did not look. That is neither a false
+pass nor a false fail, and calling it CONFORMING would be a verdict the corpus
+did not earn, so it gets its own name:
+
+| Verdict | Meaning | Exit |
+|---|---|---|
+| `CONFORMING` | every law reported on every case, zero false passes | `0` |
+| `INCOMPLETE` | zero false passes, but at least one law was never reported | `1` |
+| `NOT CONFORMING` | a false pass, or the adapter raised | `1` |
 
 That asymmetry is deliberate and it has a consequence worth stating plainly: a
 checker that rejects *everything* conforms. It has no false passes. It is also
@@ -164,6 +175,82 @@ measured data with noise, drift and de-embedding artefacts.
 here is definitely broken; one that passes is merely not-obviously-broken.
 
 Contributions of new pathological cases are the most useful thing you can send.
+
+## A worked example: scoring a checker you just wrote
+
+The corpus is committed, so this needs nothing installed except your checker.
+
+**1 — write the adapter.** It maps your checker onto one dict per file: law name
+to boolean.
+
+```python
+# mychecker_adapter.py
+import mychecker
+
+def check(path: str) -> dict[str, bool]:
+    verdicts = mychecker.analyse(path)
+    return {
+        "passivity":          verdicts.passive,
+        "reciprocity":        verdicts.reciprocal,
+        "energy_conservation": verdicts.energy_ok,
+        "positive_real_z0":   verdicts.z0_ok,
+        "group_delay_nonneg": verdicts.causal,
+    }
+```
+
+Names must match the corpus's law names — `laws` at the top of
+`data/manifest.json` is the list. A law you do not implement is absent from the
+dict, which the scorer reports as *not reported* and which makes the verdict
+`INCOMPLETE`. It is never silently counted as a pass.
+
+**2 — score it.**
+
+```bash
+$ python score.py --checker mychecker_adapter:check
+```
+
+**3 — read the two numbers separately.** False passes must be zero: each one is
+a non-physical network your checker admitted, and admitting them is how a bad
+model ships. False fails do not fail the verdict but they are not free — a
+checker that rejects everything has zero false passes and no value.
+
+The cases that most often catch a new checker, and what each one is testing:
+
+| If you fail on | The bug is almost certainly |
+|---|---|
+| `passive_resonator` | differencing phase without unwrapping, so the sharp slope at resonance reads as negative group delay |
+| `marginal_lossless` | a passivity tolerance too tight for σ_max = 1 − 1e-12 |
+| `matched_load` | dividing by ‖S‖, which is zero for an all-zero S-matrix |
+| `passive_4port` | assuming column-major everywhere; N ≥ 3 is row-major |
+| `ferrite_isolator` | treating every reciprocity failure as a defect |
+
+That last row is the judgement call rather than a bug, and it is why the corpus
+keeps a physically-real device that legitimately fails a law.
+
+## Troubleshooting
+
+**`errors: 11` and every case failed** — the adapter raised. `score.py` reports
+an error per case rather than crashing, so the message is in the output; the
+usual cause is a checker that expects an open file object rather than a path.
+
+**`false fails` is high on the passive cases** — your tolerances are tighter than
+floating point. Look at `marginal_lossless` first: it sits 1e-12 below the
+passivity limit precisely to catch this.
+
+**Verdict `INCOMPLETE`** — your adapter did not report every law. Usually the
+dict keys do not match the corpus's names, which are listed once at the top of
+`data/manifest.json` under `laws` and per case under `expect`. The reference
+adapter in `sparam_lint_adapter.py` is five lines long and gets them right.
+`INCOMPLETE` exits `1`: an unreported law was not checked, and this corpus
+cannot certify what it never saw.
+
+**`generate.py` changes the files** — it should not; regeneration is
+byte-identical and CI checks it. If your run differs, you have a different numpy
+version doing different rounding, which is worth reporting.
+
+**Scoring passes but your tool still ships bad models** — expected. Eleven cases
+is a conformance floor: failing here means definitely broken, passing means
+not-obviously-broken. It is not a sample of what comes out of a real VNA.
 
 ## Files
 
