@@ -1,0 +1,257 @@
+{
+  "corpus": "sparam-conformance",
+  "version": "1.0.0",
+  "license": "CC-BY-4.0",
+  "n_cases": 11,
+  "laws": [
+    "passivity",
+    "reciprocity",
+    "energy_conservation",
+    "positive_real_z0",
+    "group_delay_nonneg"
+  ],
+  "freq_hz": {
+    "start": 1000000000.0,
+    "stop": 40000000000.0,
+    "n": 64
+  },
+  "note": "Every network is synthesised from a closed-form model, so each label is derived from construction rather than from a checker's opinion. 'physical' marks whether the device is realizable; a device can be physical AND legitimately fail a law -- see ferrite_isolator.",
+  "cases": [
+    {
+      "name": "passive_line",
+      "file": "passive_line.s2p",
+      "n_ports": 2,
+      "z0_ohm": 50.0,
+      "physical": true,
+      "expect": {
+        "passivity": true,
+        "reciprocity": true,
+        "energy_conservation": true,
+        "positive_real_z0": true,
+        "group_delay_nonneg": true
+      },
+      "expect_all_pass": true,
+      "note": "Lossy 20 ps delay line, 0.5 dB insertion loss. The baseline sane case.",
+      "tags": [
+        "passive",
+        "2port"
+      ],
+      "sha256": "74d631c14f5c18e9e9cf06bde2579628ff15820fc4b652035cd09d2809f4166d"
+    },
+    {
+      "name": "passive_resonator",
+      "file": "passive_resonator.s2p",
+      "n_ports": 2,
+      "z0_ohm": 50.0,
+      "physical": true,
+      "expect": {
+        "passivity": true,
+        "reciprocity": true,
+        "energy_conservation": true,
+        "positive_real_z0": true,
+        "group_delay_nonneg": true
+      },
+      "expect_all_pass": true,
+      "note": "Shunt resonator, Q=30 at 20 GHz. Sharp phase slope near resonance -- the case where a group-delay check without phase unwrapping fails.",
+      "tags": [
+        "passive",
+        "2port",
+        "sharp_phase"
+      ],
+      "sha256": "1a4b1e2f9f873fcdc03327dababdccce6fc3d6ab0a0968ac70b2f03a803c3f39"
+    },
+    {
+      "name": "passive_attenuator",
+      "file": "passive_attenuator.s2p",
+      "n_ports": 2,
+      "z0_ohm": 50.0,
+      "physical": true,
+      "expect": {
+        "passivity": true,
+        "reciprocity": true,
+        "energy_conservation": true,
+        "positive_real_z0": true,
+        "group_delay_nonneg": true
+      },
+      "expect_all_pass": true,
+      "note": "Ideal 10 dB matched attenuator.",
+      "tags": [
+        "passive",
+        "2port"
+      ],
+      "sha256": "ee4b89263c942825af357be7f0273716d62ea984da5d441bcaf204c70f59963d"
+    },
+    {
+      "name": "matched_load",
+      "file": "matched_load.s2p",
+      "n_ports": 2,
+      "z0_ohm": 50.0,
+      "physical": true,
+      "expect": {
+        "passivity": true,
+        "reciprocity": true,
+        "energy_conservation": true,
+        "positive_real_z0": true,
+        "group_delay_nonneg": true
+      },
+      "expect_all_pass": true,
+      "note": "All-zero S: perfectly matched, fully absorbing. A degenerate but legal network; checkers that divide by |S| must not blow up.",
+      "tags": [
+        "passive",
+        "2port",
+        "degenerate"
+      ],
+      "sha256": "7a60bff097406dfcb7cab59bcc837935353727634161806c53eae99ba865470b"
+    },
+    {
+      "name": "marginal_lossless",
+      "file": "marginal_lossless.s2p",
+      "n_ports": 2,
+      "z0_ohm": 50.0,
+      "physical": true,
+      "expect": {
+        "passivity": true,
+        "reciprocity": true,
+        "energy_conservation": true,
+        "positive_real_z0": true,
+        "group_delay_nonneg": true
+      },
+      "expect_all_pass": true,
+      "note": "Lossless line with sigma_max = 1 - 1e-12. Sits on the passivity boundary; a checker with a too-tight tolerance false-alarms here.",
+      "tags": [
+        "passive",
+        "2port",
+        "boundary"
+      ],
+      "sha256": "2dc0808d30a664b78cc263f06a9a46b48f7920bb3e9a132d56dfe4364d9179b4"
+    },
+    {
+      "name": "passive_4port",
+      "file": "passive_4port.s4p",
+      "n_ports": 4,
+      "z0_ohm": 50.0,
+      "physical": true,
+      "expect": {
+        "passivity": true,
+        "reciprocity": true,
+        "energy_conservation": true,
+        "positive_real_z0": true,
+        "group_delay_nonneg": true
+      },
+      "expect_all_pass": true,
+      "note": "Four-port with two independent thru paths. Exercises N>2 handling.",
+      "tags": [
+        "passive",
+        "4port"
+      ],
+      "sha256": "1c24a1157c72806fa771c2e592eb8751724c8ba5cae446dc7b798dd8b0302f17"
+    },
+    {
+      "name": "active_gain",
+      "file": "active_gain.s2p",
+      "n_ports": 2,
+      "z0_ohm": 50.0,
+      "physical": false,
+      "expect": {
+        "passivity": false,
+        "reciprocity": true,
+        "energy_conservation": false,
+        "positive_real_z0": true,
+        "group_delay_nonneg": true
+      },
+      "expect_all_pass": false,
+      "note": "Delay line with 3x through-path gain. Creates energy: fails both the spectral-norm and the row-power tests.",
+      "tags": [
+        "nonphysical",
+        "2port"
+      ],
+      "sha256": "3f78dfcd6598f6734633a65a37e30edc8c4486c89d0c2e29cc52720780f22c32"
+    },
+    {
+      "name": "energy_row_violation",
+      "file": "energy_row_violation.s2p",
+      "n_ports": 2,
+      "z0_ohm": 50.0,
+      "physical": false,
+      "expect": {
+        "passivity": false,
+        "reciprocity": true,
+        "energy_conservation": false,
+        "positive_real_z0": true,
+        "group_delay_nonneg": true
+      },
+      "expect_all_pass": false,
+      "note": "Row power > 1 when port 1 is driven.",
+      "tags": [
+        "nonphysical",
+        "2port"
+      ],
+      "sha256": "05e30904110032dc75777b11b96dbde5398ae9e922ab64a89704f9675db7ae83"
+    },
+    {
+      "name": "negative_resistance",
+      "file": "negative_resistance.s2p",
+      "n_ports": 2,
+      "z0_ohm": 50.0,
+      "physical": false,
+      "expect": {
+        "passivity": false,
+        "reciprocity": true,
+        "energy_conservation": false,
+        "positive_real_z0": false,
+        "group_delay_nonneg": true
+      },
+      "expect_all_pass": false,
+      "note": "|S11| > 1 gives Re(Z_in) < 0: negative resistance at the port. It unavoidably breaks energy conservation too -- a reflection coefficient above unity returns more power than arrives -- so this case cannot isolate a single law, and the label says so.",
+      "tags": [
+        "nonphysical",
+        "2port"
+      ],
+      "sha256": "2eb111856d1bfcdfb53e93f873704073f21af7926cb2ed18f5b2ef5b3114fdcc"
+    },
+    {
+      "name": "noncausal_advance",
+      "file": "noncausal_advance.s2p",
+      "n_ports": 2,
+      "z0_ohm": 50.0,
+      "physical": false,
+      "expect": {
+        "passivity": true,
+        "reciprocity": true,
+        "energy_conservation": true,
+        "positive_real_z0": true,
+        "group_delay_nonneg": false
+      },
+      "expect_all_pass": false,
+      "note": "Phase advances with frequency: the output precedes the input. Passive and reciprocal, so ONLY the causality check should fire.",
+      "tags": [
+        "nonphysical",
+        "2port",
+        "isolates_one_law"
+      ],
+      "sha256": "ede95a08f616205688b97eac8c7665b2491ce4a038767614ebc69ad0730ffe5c"
+    },
+    {
+      "name": "ferrite_isolator",
+      "file": "ferrite_isolator.s2p",
+      "n_ports": 2,
+      "z0_ohm": 50.0,
+      "physical": true,
+      "expect": {
+        "passivity": true,
+        "reciprocity": false,
+        "energy_conservation": true,
+        "positive_real_z0": true,
+        "group_delay_nonneg": true
+      },
+      "expect_all_pass": false,
+      "note": "A ferrite isolator. NON-RECIPROCAL BY DESIGN and entirely realizable -- the medium is not reciprocal. The reciprocity check correctly fires, and that is a true positive for the law but NOT a defect in the device. Any tool reporting this must let the user say so.",
+      "tags": [
+        "physical",
+        "2port",
+        "expected_law_failure"
+      ],
+      "sha256": "574d727015c7c3bb436bf1f9723098ac12a73e0392d3e2045a1b356c53e57f30"
+    }
+  ]
+}
