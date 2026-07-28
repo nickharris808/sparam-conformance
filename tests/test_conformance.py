@@ -213,3 +213,20 @@ def test_index_matches_the_manifest_exactly():
     subprocess.run([_sys.executable, str(here / "build_index.py")],
                    capture_output=True, check=True)
     assert idx.read_bytes() == before, "index.jsonl is stale vs the manifest"
+
+
+def test_readme_flags_the_one_figure_it_cannot_reproduce():
+    """1.2441 is a pre-fix value from a superseded generator revision.
+
+    Every other number on the card re-derives from the committed corpus. This
+    one does not, so the card has to say so -- and the resonator it describes
+    must actually be passive today, or the anecdote is worse than the bug.
+    """
+    readme = (HERE / "README.md").read_text()
+    assert "1.2441" in readme, "drop this guard along with the figure"
+    assert "cannot reproduce from the" in readme
+    assert "superseded generator revision" in readme
+
+    net = read_touchstone(str(HERE / "data" / "passive_resonator.s2p"))
+    sigma = float(np.max(np.linalg.svd(net.s, compute_uv=False)))
+    assert sigma <= 1.0 + 1e-9, f"shipped resonator is not passive: {sigma}"

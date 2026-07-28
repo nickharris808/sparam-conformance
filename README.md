@@ -21,7 +21,7 @@ configs:
 
 # sparam-conformance
 
-![CI](https://github.com/nickharris808/sparam-conformance/actions/workflows/ci.yml/badge.svg) ![Licence](https://img.shields.io/badge/data-CC--BY--4.0-green) ![Cases](https://img.shields.io/badge/cases-11%20labelled-blue) ![Tests](https://img.shields.io/badge/tests-47%20passing-brightgreen)
+![CI](https://github.com/nickharris808/sparam-conformance/actions/workflows/ci.yml/badge.svg) ![Licence](https://img.shields.io/badge/data-CC--BY--4.0-green) ![Cases](https://img.shields.io/badge/cases-11%20labelled-blue) ![Tests](https://img.shields.io/badge/tests-48%20passing-brightgreen)
 
 **A labelled corpus of S-parameter networks with ground-truth physical verdicts —
 and a scorer that grades any checker against it.**
@@ -143,6 +143,12 @@ That check earned its place: it caught **three wrong labels** during development
 The "passive" resonator had σ_max = 1.2441 and was not passive at all; a case
 meant to isolate energy was also non-reciprocal; and `negative_resistance`
 unavoidably breaks energy conservation too, which the original label denied.
+
+That 1.2441 is the one figure on this page you cannot reproduce from the
+committed corpus — it belonged to a superseded generator revision, and the
+resonator that ships today has σ_max ≤ 1, which the test suite asserts. It is
+recorded because "we found bugs in our own ground truth" is worth more with a
+number attached than without one.
 
 Generation is deterministic, files are SHA-256 pinned in the manifest, and both
 properties are tested.
