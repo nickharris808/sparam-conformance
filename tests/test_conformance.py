@@ -20,9 +20,10 @@ HERE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "sparam-lint" / "src"))
 
+from sparam_lint import read_touchstone  # noqa: E402
+
 from generate import LAWS  # noqa: E402
 from score import load_manifest, score  # noqa: E402
-from sparam_lint import read_touchstone  # noqa: E402
 
 DATA = HERE / "data"
 MANIFEST = load_manifest(DATA)
