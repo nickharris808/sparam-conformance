@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "sparam-conformance"
+abstract: "A labelled corpus of S-parameter networks with ground-truth physical verdicts."
+type: software
+authors:
+  - name: "ChipletOS / Genesis contributors"
+version: 0.1.0
+date-released: 2026-07-28
+license: CC-BY-4.0
+repository-code: "https://github.com/nickharris808/sparam-conformance"
+url: "https://nickharris808.github.io/physics-lint/"
+keywords:
+  - rf
+  - signal-integrity
+  - physics
+  - verification

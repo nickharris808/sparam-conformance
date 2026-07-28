@@ -23,6 +23,8 @@ configs:
 
 ![CI](https://github.com/nickharris808/sparam-conformance/actions/workflows/ci.yml/badge.svg) ![Licence](https://img.shields.io/badge/data-CC--BY--4.0-green) ![Cases](https://img.shields.io/badge/cases-11%20labelled-blue) ![Tests](https://img.shields.io/badge/tests-51%20passing-brightgreen)
 
+📖 **[Documentation site](https://nickharris808.github.io/physics-lint/)** — the portfolio narrative, the concepts, a full walkthrough, and what all of this proves (and does not).
+
 **A labelled corpus of S-parameter networks with ground-truth physical verdicts —
 and a scorer that grades any checker against it.**
 
