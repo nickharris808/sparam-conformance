@@ -21,12 +21,14 @@ configs:
 
 # sparam-conformance
 
-![CI](https://github.com/nickharris808/sparam-conformance/actions/workflows/ci.yml/badge.svg) ![Licence](https://img.shields.io/badge/data-CC--BY--4.0-green) ![Cases](https://img.shields.io/badge/cases-11%20labelled-blue) ![Tests](https://img.shields.io/badge/tests-51%20passing-brightgreen)
+![CI](https://github.com/nickharris808/sparam-conformance/actions/workflows/ci.yml/badge.svg) ![Licence](https://img.shields.io/badge/data-CC--BY--4.0-green) ![Cases](https://img.shields.io/badge/cases-11%20labelled-blue) ![Tests](https://img.shields.io/badge/tests-57%20passing-brightgreen)
 
 📖 **[Documentation site](https://nickharris808.github.io/physics-lint/)** — the portfolio narrative, the concepts, a full walkthrough, and what all of this proves (and does not).
 
 **A labelled corpus of S-parameter networks with ground-truth physical verdicts —
 and a scorer that grades any checker against it.**
+
+## Why this exists
 
 There is no public dataset of *physically invalid* S-parameter files. Everyone
 building an RF validation tool tests it on files that happen to be lying around,
@@ -302,3 +304,11 @@ The corpus is synthetic and contains no proprietary or measured data.
 - [`sparam-lint`](https://github.com/nickharris808/sparam-lint) — the reference checker (Apache-2.0)
 - [ChipletOS](https://chipletos.com) — scattering synthesis that is passive *by
   construction*, so it cannot fail these laws whatever its parameters
+
+## Contributing
+
+One non-negotiable rule here: every label must be **derived from construction**, never from another tool's opinion — and re-verified independently in the test suite. [`CONTRIBUTING.md`](CONTRIBUTING.md) has the detail. Each sibling repository states its own, and they differ — that is deliberate, and it is why each is trustworthy on its own terms.
+
+## Citation
+
+[`CITATION.cff`](CITATION.cff) is machine-readable; GitHub renders a “Cite this repository” button from it.
